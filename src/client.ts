@@ -1,19 +1,20 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from "axios";
 import {
   CreateCollectionDocument,
   CreateCollectionsOptions,
   CreateCollectionRequest,
   OperationResponse,
   SearchCollectionResponse,
-} from './models';
+  ConnectResponse,
+} from "./models";
 
 const TIMEOUT = 60000;
 
 class Collection {
   name: string;
-  client: Colbertdb;
+  client: ColbertDB;
 
-  constructor(name: string, client: Colbertdb) {
+  constructor(name: string, client: ColbertDB) {
     this.name = name;
     this.client = client;
   }
@@ -28,7 +29,9 @@ class Collection {
     return this;
   }
 
-  async addDocuments(documents: CreateCollectionDocument[]): Promise<Collection> {
+  async addDocuments(
+    documents: CreateCollectionDocument[]
+  ): Promise<Collection> {
     await this.client.addToCollection(this.name, documents);
     return this;
   }
@@ -38,29 +41,31 @@ class Collection {
   }
 }
 
-class Colbertdb {
+class ColbertDB {
   url: string;
   apiKey?: string;
   storeName?: string;
   accessToken?: string;
 
-  constructor(url: string, apiKey?: string, storeName: string = 'default') {
+  constructor(url: string, apiKey?: string, storeName: string = "default") {
     this.url = url;
     this.apiKey = apiKey;
     this.storeName = storeName;
-    this.connect();
   }
 
-  private async connect(): Promise<void> {
+  public async connect(): Promise<ColbertDB> {
     try {
-      const response: AxiosResponse<any> = await axios.post(
+      const response: AxiosResponse<ConnectResponse> = await axios.post(
         `${this.url}/api/v1/client/connect/${this.storeName}`,
         {},
-        { headers: { 'x-api-key': this.apiKey }, timeout: TIMEOUT }
+        { headers: { "x-api-key": this.apiKey }, timeout: TIMEOUT }
       );
       this.accessToken = response.data.access_token;
+      return this;
     } catch (error: any) {
-      throw new Error(`Failed to connect to the Colbertdb server - ${error.response?.data?.detail}`);
+      throw new Error(
+        `Failed to connect to the Colbertdb server - ${error.response?.data?.detail}`
+      );
     }
   }
 
@@ -106,15 +111,15 @@ class Colbertdb {
     options?: CreateCollectionsOptions
   ): Promise<Collection> {
     if (documents.length === 0) {
-      throw new Error('At least one document must be provided.');
+      throw new Error("At least one document must be provided.");
     }
     const data: CreateCollectionRequest = { name, documents, options };
-    await this.post('/', data);
+    await this.post("/", data);
     return new Collection(name, this);
   }
 
   async listCollections(): Promise<string[]> {
-    const response = await this.get('/', {});
+    const response = await this.get("/", {});
     return response.collections;
   }
 
@@ -126,17 +131,27 @@ class Colbertdb {
     return new Collection(name, this);
   }
 
-  async searchCollection(name: string, query: string, k?: number): Promise<SearchCollectionResponse> {
+  async searchCollection(
+    name: string,
+    query: string,
+    k?: number
+  ): Promise<SearchCollectionResponse> {
     const data = { query, k };
     return this.post(`/${name}/search`, data);
   }
 
-  async deleteDocuments(name: string, documentIds: string[]): Promise<OperationResponse> {
+  async deleteDocuments(
+    name: string,
+    documentIds: string[]
+  ): Promise<OperationResponse> {
     const data = { document_ids: documentIds };
     return this.post(`/${name}/delete`, data);
   }
 
-  async addToCollection(name: string, documents: CreateCollectionDocument[]): Promise<OperationResponse> {
+  async addToCollection(
+    name: string,
+    documents: CreateCollectionDocument[]
+  ): Promise<OperationResponse> {
     const data = { documents };
     return this.post(`/${name}/documents`, data);
   }
@@ -146,4 +161,4 @@ class Colbertdb {
   }
 }
 
-export { Colbertdb, Collection };
+export { ColbertDB, Collection };

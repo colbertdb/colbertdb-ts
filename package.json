@@ -1,7 +1,7 @@
 {
-  "name": "your-package-name",
-  "version": "1.0.0",
-  "description": "Your package description",
+  "name": "colbertdb-ts",
+  "version": "1.1.0",
+  "description": "A typescript client for colbertDB",
   "main": "dist/client.js",
   "types": "dist/client.d.ts",
   "scripts": {
@@ -10,16 +10,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/your-repo.git"
+    "url": "https://github.com/colbertdb/colbertdb-ts"
   },
-  "author": "Your Name",
+  "author": "Ryan Sloan",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1"
   },
   "devDependencies": {
-    "typescript": "^4.2.3",
+    "@types/axios": "^0.14.0",
     "@types/node": "^14.14.31",
-    "@types/axios": "^0.14.0"
+    "colbertdb-ts": "^1.1.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^8.57.0",
+    "globals": "^15.3.0",
+    "llamaindex": "^0.3.15",
+    "prettier": "^3.3.1",
+    "typescript": "^4.2.3",
+    "typescript-eslint": "^7.12.0"
   }
 }
